@@ -36,3 +36,8 @@ def seed_5_example_profiles():
             )
             temp_number += 1
         session.commit()
+
+if __name__ == "__main__":
+    print("Starting seed...")
+    seed_5_example_profiles()
+    print("Seed completed")

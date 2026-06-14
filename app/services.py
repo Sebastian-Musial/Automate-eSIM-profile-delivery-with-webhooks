@@ -34,6 +34,6 @@ def assign_esim_profile(session: Session, order_id: str, customer_email: str) ->
     print("\nWitam," \
     "\nPonizej kod QR dla zamowienia " + order_id + " twojego pakietu danych eSIM dla podroznych")
     print(profil_ava.qr_image_url)
-    print("Dziekujemy za zakup")
+    print("Dziekujemy za zakup\n")
 
     return AssignEsimResult.ASSIGNED

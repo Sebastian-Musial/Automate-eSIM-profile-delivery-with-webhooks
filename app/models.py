@@ -14,6 +14,6 @@ class EsimProfile(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     qr_code_value: str 
     qr_image_url: str 
-    status: EsimStatus = Field(default=EsimStatus.available)
+    status: EsimStatus = Field(default=EsimStatus.AVAILABLE)
     assigned_order_id: str | None = Field(default=None)
     assigned_at: datetime | None = Field(default=None)
