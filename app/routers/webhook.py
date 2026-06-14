@@ -4,7 +4,7 @@ from sqlmodel import Session
 from app.schemas import PayloadWebhook, WebhookResponse
 from app.database import get_session
 from app.config import settings
-from app.services import assign_esim_profile
+from app.services import assign_esim_profile, AssignEsimResult
 
 router = APIRouter()
 
@@ -23,15 +23,22 @@ def payment_webhook(payload: PayloadWebhook, x_webhook_token: str | None = Heade
                 message="Payment is not completed. Wrong payment status"
             )
 
-    if (assign_esim_profile(session, payload.order_id, payload.customer_email)): #Template dla funkcji w service.py która będzie wykonywała logikę biznesową - chce aby funkcja zwracała wartość bool aby potwierdzić wykonanie
-        return WebhookResponse(
-            result="ASSIGNED",
-            order_id=payload.order_id,
-            message="Payment webhook processed and eSIM assigned"
-        )
-    else:         
-        return WebhookResponse( # W przypadku braku wolnych profili oraz w przypadku zdublowania się zamówień prder_id
-            result="IGNORED",
-            order_id=payload.order_id,
-            message="TEMPLATE WRONG"
-        )
+    match assign_esim_profile(session, payload.order_id, payload.customer_email):
+        case AssignEsimResult.ASSIGNED:
+            return WebhookResponse(
+                result="ASSIGNED",
+                order_id=payload.order_id,
+                message="Payment webhook processed and eSIM assigned"
+            )
+        case AssignEsimResult.DUPLICATED:      
+            return WebhookResponse(
+                result="DUPLICATED",
+                order_id=payload.order_id,
+                message="Duplicated order"
+            )
+        case AssignEsimResult.NOT_AVAILABLE:
+            return WebhookResponse(
+                result="NOT_AVAILABLE",
+                order_id=payload.order_id,
+                message="No available eSIM profile"
+            )
