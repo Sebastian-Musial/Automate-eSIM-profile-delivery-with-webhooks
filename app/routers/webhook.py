@@ -3,13 +3,13 @@ from sqlmodel import Session
 
 from app.schemas import PayloadWebhook, WebhookResponse
 from app.database import get_session
-from app.config import settings
+from app.config import Settings, get_settings
 from app.services import assign_esim_profile, AssignEsimResult
 
 router = APIRouter()
 
 @router.post("/api/webhooks/payment", response_model=WebhookResponse, status_code=status.HTTP_200_OK, tags=["Webhooks"])
-def payment_webhook(payload: PayloadWebhook, x_webhook_token: str | None = Header(default=None), session: Session = Depends(get_session) ) -> WebhookResponse:
+def payment_webhook(payload: PayloadWebhook, x_webhook_token: str | None = Header(default=None), settings: Settings = Depends(get_settings), session: Session = Depends(get_session) ) -> WebhookResponse:
     if (x_webhook_token != settings.webhook_token):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
